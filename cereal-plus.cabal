@@ -41,7 +41,7 @@ library
   hs-source-dirs:
     src
   exposed-modules:
-    CerealPlus.Serializable
+    CerealPlus
     CerealPlus.SerializableM
     CerealPlus.DeserializeT
     CerealPlus.SerializeT
