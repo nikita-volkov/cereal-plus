@@ -4,13 +4,14 @@ module CerealPlus.DeserializeT
   (
     Deserialize,
     DeserializeT,
-    run,
+    runPartial,
     Result(..),
     liftGet,
+    mapBase,
   )
   where
 
-import CerealPlus.Prelude hiding (Result(..))
+import CerealPlus.Prelude
 import qualified Data.Serialize.Get as Cereal
 
 
@@ -19,7 +20,7 @@ type Deserialize = DeserializeT Identity
 
 -- | A deserialization monad transformer. 
 -- Useful for mutable types, which live in monads like `IO`.
-newtype DeserializeT m a = DeserializeT { run :: ByteString -> m (Result m a) }
+newtype DeserializeT m a = DeserializeT { runPartial :: ByteString -> m (Result m a) }
 
 instance (Monad m) => Monad (DeserializeT m) where
   DeserializeT runA >>= aToDeserializeTB = DeserializeT $ \bs -> runA bs >>= aToMB where
@@ -56,3 +57,13 @@ liftGet get = DeserializeT $ \bs -> return $ convertResult $ Cereal.runGetPartia
       Cereal.Fail m bs -> Fail m bs
       Cereal.Partial cont -> Partial $ \bs -> return $ convertResult $ cont bs
       Cereal.Done a bs -> Done a bs
+
+mapBase :: (Monad m, Monad m') => (forall b. m b -> m' b) -> DeserializeT m a -> DeserializeT m' a
+mapBase mToM' (DeserializeT runPartial) = DeserializeT $ runPartialToRunPartial' runPartial
+  where
+    runPartialToRunPartial' runPartial = 
+      mToM' . runPartial >=> \case
+        Fail m bs -> return $ Fail m bs
+        Partial runPartial' -> return $ Partial $ runPartialToRunPartial' runPartial'
+        Done a bs -> return $ Done a bs
+
