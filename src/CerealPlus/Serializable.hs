@@ -96,32 +96,32 @@ instance Serializable AbsoluteTime where
 
 -- 'cereal' primitive instances wrappers:
 
-instance Serializable Bool where serialize = serializeCereal; deserialize = deserializeCereal
-instance Serializable Char where serialize = serializeCereal; deserialize = deserializeCereal
-instance Serializable Double where serialize = serializeCereal; deserialize = deserializeCereal
-instance Serializable Float where serialize = serializeCereal; deserialize = deserializeCereal
-instance Serializable Int where serialize = serializeCereal; deserialize = deserializeCereal
-instance Serializable Int8 where serialize = serializeCereal; deserialize = deserializeCereal
-instance Serializable Int16 where serialize = serializeCereal; deserialize = deserializeCereal
-instance Serializable Int32 where serialize = serializeCereal; deserialize = deserializeCereal
-instance Serializable Int64 where serialize = serializeCereal; deserialize = deserializeCereal
-instance Serializable Integer where serialize = serializeCereal; deserialize = deserializeCereal
-instance Serializable Ordering where serialize = serializeCereal; deserialize = deserializeCereal
-instance Serializable Word where serialize = serializeCereal; deserialize = deserializeCereal
-instance Serializable Word8 where serialize = serializeCereal; deserialize = deserializeCereal
-instance Serializable Word16 where serialize = serializeCereal; deserialize = deserializeCereal
-instance Serializable Word32 where serialize = serializeCereal; deserialize = deserializeCereal
-instance Serializable Word64 where serialize = serializeCereal; deserialize = deserializeCereal
-instance Serializable () where serialize = serializeCereal; deserialize = deserializeCereal
-instance Serializable ByteString where serialize = serializeCereal; deserialize = deserializeCereal
-instance Serializable LazyByteString where serialize = serializeCereal; deserialize = deserializeCereal
-instance Serializable IntSet where serialize = serializeCereal; deserialize = deserializeCereal
+instance Serializable Bool where serialize = put; deserialize = get
+instance Serializable Char where serialize = put; deserialize = get
+instance Serializable Double where serialize = put; deserialize = get
+instance Serializable Float where serialize = put; deserialize = get
+instance Serializable Int where serialize = put; deserialize = get
+instance Serializable Int8 where serialize = put; deserialize = get
+instance Serializable Int16 where serialize = put; deserialize = get
+instance Serializable Int32 where serialize = put; deserialize = get
+instance Serializable Int64 where serialize = put; deserialize = get
+instance Serializable Integer where serialize = put; deserialize = get
+instance Serializable Ordering where serialize = put; deserialize = get
+instance Serializable Word where serialize = put; deserialize = get
+instance Serializable Word8 where serialize = put; deserialize = get
+instance Serializable Word16 where serialize = put; deserialize = get
+instance Serializable Word32 where serialize = put; deserialize = get
+instance Serializable Word64 where serialize = put; deserialize = get
+instance Serializable () where serialize = put; deserialize = get
+instance Serializable ByteString where serialize = put; deserialize = get
+instance Serializable LazyByteString where serialize = put; deserialize = get
+instance Serializable IntSet where serialize = put; deserialize = get
 
-serializeCereal :: (Cereal.Serialize a) => a -> Serialize ()
-serializeCereal = SerializeT.liftPut . Cereal.put
+put :: (Cereal.Serialize a) => a -> Serialize ()
+put = SerializeT.liftPut . Cereal.put
 
-deserializeCereal :: (Cereal.Serialize a) => Deserialize a
-deserializeCereal = DeserializeT.liftGet Cereal.get
+get :: (Cereal.Serialize a) => Deserialize a
+get = DeserializeT.liftGet Cereal.get
 
 
 -- Monoid wrappers instances:
