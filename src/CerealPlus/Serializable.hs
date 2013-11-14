@@ -22,8 +22,17 @@ import qualified Data.Sequence
 import qualified Data.HashMap.Strict
 import qualified Data.HashMap.Lazy
 import qualified Data.HashSet
+import qualified Data.HashTable.Class as Hashtables_Class
+import qualified Data.HashTable.IO as Hashtables_IO
+import qualified Data.HashTable.ST.Basic as Hashtables_Basic
+import qualified Data.HashTable.ST.Cuckoo as Hashtables_Cuckoo
+import qualified Data.HashTable.ST.Linear as Hashtables_Linear
 
 
+-- |
+-- Support for serialization of a data type in a monadic context (e.g., 'IO', 'ST', 'Control.Concurrent.STM.STM'),
+-- meaning that this can be used to provide serialization support for mutable data.
+-- 
 class Serializable a m where
   serialize :: a -> SerializeT m ()
   deserialize :: DeserializeT m a
@@ -291,3 +300,67 @@ deserializeVector :: (Applicative m, Monad m, Data.Vector.Generic.Vector v a, Se
 deserializeVector = do
   length <- deserialize
   Data.Vector.Generic.replicateM length deserialize
+
+
+-- 'hashtables' instances:
+
+instance ( Serializable a (ST s), Serializable b (ST s), Hashable a, Eq a ) => 
+         Serializable (Hashtables_Basic.HashTable s a b) (ST s) where
+  serialize = serializeHashTableST
+  deserialize = deserializeHashTableST
+
+instance ( Serializable a (ST s), Serializable b (ST s), Hashable a, Eq a ) => 
+         Serializable (Hashtables_Cuckoo.HashTable s a b) (ST s) where
+  serialize = serializeHashTableST
+  deserialize = deserializeHashTableST
+
+instance ( Serializable a (ST s), Serializable b (ST s), Hashable a, Eq a ) => 
+         Serializable (Hashtables_Linear.HashTable s a b) (ST s) where
+  serialize = serializeHashTableST
+  deserialize = deserializeHashTableST
+
+serializeHashTableST :: 
+  (Hashtables_Class.HashTable t, Serializable a (ST s), Serializable b (ST s)) => 
+  t s a b -> SerializeT (ST s) ()
+serializeHashTableST t = do
+  join $ lift $ Hashtables_Class.foldM (\a b -> return $ a >> processRow b) (return ()) t
+  signalEnd
+  where
+    processRow (k, v) = do
+      signalRow
+      serialize k
+      serialize v
+    signalRow = serialize True
+    signalEnd = serialize False
+
+deserializeHashTableST :: 
+  (Hashtables_Class.HashTable t, Serializable a (ST s), Serializable b (ST s), Hashable a, Eq a) => 
+  DeserializeT (ST s) (t s a b)
+deserializeHashTableST = do
+  t <- lift $ Hashtables_Class.new
+  loop $ do
+    (k, v) <- deserializeRow
+    lift $ Hashtables_Class.insert t k v
+  return t
+  where
+    loop action = do
+      deserialize >>= \case
+        False -> return ()
+        True -> action >> loop action
+    deserializeRow = (,) <$> deserialize <*> deserialize
+
+instance ( Serializable a (ST RealWorld), Serializable b (ST RealWorld), Hashable a, Eq a ) => 
+         Serializable (Hashtables_Basic.HashTable RealWorld a b) IO where
+  serialize = SerializeT.mapBase stToIO . serializeHashTableST
+  deserialize = DeserializeT.mapBase stToIO deserializeHashTableST
+
+instance ( Serializable a (ST RealWorld), Serializable b (ST RealWorld), Hashable a, Eq a ) => 
+         Serializable (Hashtables_Cuckoo.HashTable RealWorld a b) IO where
+  serialize = SerializeT.mapBase stToIO . serializeHashTableST
+  deserialize = DeserializeT.mapBase stToIO deserializeHashTableST
+
+instance ( Serializable a (ST RealWorld), Serializable b (ST RealWorld), Hashable a, Eq a ) => 
+         Serializable (Hashtables_Linear.HashTable RealWorld a b) IO where
+  serialize = SerializeT.mapBase stToIO . serializeHashTableST
+  deserialize = DeserializeT.mapBase stToIO deserializeHashTableST
+
