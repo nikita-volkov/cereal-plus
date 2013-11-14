@@ -1,13 +1,13 @@
-# acid-io
-Low-level general APIs for implementing persistence, server and client over mutable data-structures in 'IO'.
+# cereal-plus
+An extended serialization library on top of "cereal".
+
+## Features
+- Provides non-orphan instances for an extended range of types.
+- Provides transformer types and support for mutable data.
+- Reapproaches the naming conventions of "cereal" library.
 
 ## Status
 In development.
 
-<!-- 
-## Links:
-- http://hackage.haskell.org/package/acid-io
--->
-
 ---
-[![Build Status](https://travis-ci.org/acid-state/acid-io.png)](https://travis-ci.org/acid-state/acid-io)
+[![Build Status](https://travis-ci.org/nikita-volkov/cereal-plus.png)](https://travis-ci.org/nikita-volkov/cereal-plus)

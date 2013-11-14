@@ -3,11 +3,11 @@ name:
 version:
   0.1.0
 synopsis:
-  Extended serialization library on top of 'cereal'.
+  Extended serialization library on top of "cereal".
 description:
   Provides non-orphan instances for an extended range of types.
   Provides transformer types and support for mutable data.
-  Reapproaches the naming conventions of 'cereal' library.
+  Reapproaches the naming conventions of "cereal" library.
 license:
   MIT
 license-file:
