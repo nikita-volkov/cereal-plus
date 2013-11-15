@@ -421,3 +421,14 @@ instance (Serializable a IO) => Serializable (MVar a) IO where
   serialize = lift . readMVar >=> serialize
   deserialize = deserialize >>= lift . newMVar
 
+
+-- Instances for 'stm':
+
+instance (Serializable a STM) => Serializable (TVar a) STM where
+  serialize = serialize <=< lift . readTVar
+  deserialize = lift . newTVar =<< deserialize
+
+instance (Serializable a IO) => Serializable (TVar a) IO where
+  serialize = lift . atomically . readTVar >=> serialize
+  deserialize = deserialize >>= lift . atomically . newTVar
+

@@ -57,6 +57,9 @@ import Control.Monad.Reader as Exports hiding (mapM_, sequence_, forM_, msum, ma
 import Control.Monad.Writer as Exports hiding (mapM_, sequence_, forM_, msum, mapM, sequence, forM)
 import Control.Monad.Trans as Exports
 
+-- stm
+import Control.Concurrent.STM as Exports
+
 -- bytestring
 import Data.ByteString as Exports (ByteString)
 
