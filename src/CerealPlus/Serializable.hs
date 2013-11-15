@@ -30,9 +30,11 @@ import qualified Data.HashTable.ST.Linear as Hashtables_Linear
 
 
 -- |
--- Support for serialization of a data type in a monadic context (e.g., 'IO', 'ST', 'Control.Concurrent.STM.STM'),
+-- Support for serialization of a data type in a monadic context 
+-- (e.g., 'IO', 'ST', 'Control.Concurrent.STM.STM', 'Identity'),
 -- meaning that this can be used to provide serialization support for mutable data.
 -- 
+-- To use it in a pure context, use 'Identity' monad.
 class Serializable a m where
   serialize :: (Monad m, Applicative m) => a -> SerializeT m ()
   deserialize :: (Monad m, Applicative m) => DeserializeT m a
