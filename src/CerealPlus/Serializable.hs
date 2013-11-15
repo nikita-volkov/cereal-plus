@@ -1,8 +1,8 @@
 module CerealPlus.Serializable (Serializable(..)) where
 
 import CerealPlus.Prelude
-import qualified CerealPlus.SerializeT as SerializeT; import CerealPlus.SerializeT (SerializeT)
-import qualified CerealPlus.DeserializeT as DeserializeT; import CerealPlus.DeserializeT (DeserializeT)
+import qualified CerealPlus.Serialize as Serialize; import CerealPlus.Serialize (Serialize)
+import qualified CerealPlus.Deserialize as Deserialize; import CerealPlus.Deserialize (Deserialize)
 import qualified Data.Serialize as Cereal
 import qualified Data.Text.Encoding as Text
 import qualified Data.Text.Lazy.Encoding as LazyText
@@ -36,8 +36,8 @@ import qualified Data.HashTable.ST.Linear as Hashtables_Linear
 -- 
 -- To use it in a pure context, use 'Identity' monad.
 class Serializable a m where
-  serialize :: (Monad m, Applicative m) => a -> SerializeT m ()
-  deserialize :: (Monad m, Applicative m) => DeserializeT m a
+  serialize :: (Monad m, Applicative m) => a -> Serialize m ()
+  deserialize :: (Monad m, Applicative m) => Deserialize m a
 
 
 instance (HasResolution a, Fractional (Fixed a)) => Serializable (Fixed a) m where
@@ -127,11 +127,11 @@ instance Serializable ByteString m where serialize = put; deserialize = get
 instance Serializable LazyByteString m where serialize = put; deserialize = get
 instance Serializable IntSet m where serialize = put; deserialize = get
 
-put :: (Monad m, Applicative m, Cereal.Serialize a) => a -> SerializeT m ()
-put = SerializeT.liftPut . Cereal.put
+put :: (Monad m, Applicative m, Cereal.Serialize a) => a -> Serialize m ()
+put = Serialize.liftPut . Cereal.put
 
-get :: (Monad m, Applicative m, Cereal.Serialize a) => DeserializeT m a
-get = DeserializeT.liftGet Cereal.get
+get :: (Monad m, Applicative m, Cereal.Serialize a) => Deserialize m a
+get = Deserialize.liftGet Cereal.get
 
 
 -- Monoid wrappers instances:
@@ -266,12 +266,12 @@ instance (Serializable e m, Serializable i m, IArray UArray e, Ix i) => Serializ
   serialize = serializeArray
   deserialize = deserializeArray
 
-serializeArray :: (Monad m, Applicative m, Ix i, Serializable e m, Serializable i m, IArray a e) => a i e -> SerializeT m ()
+serializeArray :: (Monad m, Applicative m, Ix i, Serializable e m, Serializable i m, IArray a e) => a i e -> Serialize m ()
 serializeArray a = do 
   serialize $ Data.Array.IArray.bounds a
   serialize $ Data.Array.IArray.elems a
 
-deserializeArray :: (Monad m, Applicative m, Ix i, Serializable e m, Serializable i m, IArray a e) => DeserializeT m (a i e)
+deserializeArray :: (Monad m, Applicative m, Ix i, Serializable e m, Serializable i m, IArray a e) => Deserialize m (a i e)
 deserializeArray = Data.Array.IArray.listArray <$> deserialize <*> deserialize
 
 
@@ -293,12 +293,12 @@ instance (Serializable a m, Data.Vector.Unboxed.Unbox a) => Serializable (UVecto
   serialize = serializeVector
   deserialize = deserializeVector
 
-serializeVector :: (Monad m, Applicative m, Data.Vector.Generic.Vector v a, Serializable a m) => v a -> SerializeT m ()
+serializeVector :: (Monad m, Applicative m, Data.Vector.Generic.Vector v a, Serializable a m) => v a -> Serialize m ()
 serializeVector a = do
   serialize (Data.Vector.Generic.length a)
   Data.Vector.Generic.mapM_ serialize a
 
-deserializeVector :: (Monad m, Applicative m, Data.Vector.Generic.Vector v a, Serializable a m) => DeserializeT m (v a)
+deserializeVector :: (Monad m, Applicative m, Data.Vector.Generic.Vector v a, Serializable a m) => Deserialize m (v a)
 deserializeVector = do
   length <- deserialize
   Data.Vector.Generic.replicateM length deserialize
@@ -323,7 +323,7 @@ instance ( Serializable a (ST s), Serializable b (ST s), Hashable a, Eq a ) =>
 
 serializeHashTableST :: 
   (Hashtables_Class.HashTable t, Serializable a (ST s), Serializable b (ST s)) => 
-  t s a b -> SerializeT (ST s) ()
+  t s a b -> Serialize (ST s) ()
 serializeHashTableST t = do
   join $ lift $ Hashtables_Class.foldM (\a b -> return $ a >> processRow b) (return ()) t
   signalEnd
@@ -337,7 +337,7 @@ serializeHashTableST t = do
 
 deserializeHashTableST :: 
   (Hashtables_Class.HashTable t, Serializable a (ST s), Serializable b (ST s), Hashable a, Eq a) => 
-  DeserializeT (ST s) (t s a b)
+  Deserialize (ST s) (t s a b)
 deserializeHashTableST = do
   t <- lift $ Hashtables_Class.new
   loop $ do
@@ -353,16 +353,16 @@ deserializeHashTableST = do
 
 instance ( Serializable a (ST RealWorld), Serializable b (ST RealWorld), Hashable a, Eq a ) => 
          Serializable (Hashtables_Basic.HashTable RealWorld a b) IO where
-  serialize = SerializeT.mapBase stToIO . serializeHashTableST
-  deserialize = DeserializeT.mapBase stToIO deserializeHashTableST
+  serialize = Serialize.mapBase stToIO . serializeHashTableST
+  deserialize = Deserialize.mapBase stToIO deserializeHashTableST
 
 instance ( Serializable a (ST RealWorld), Serializable b (ST RealWorld), Hashable a, Eq a ) => 
          Serializable (Hashtables_Cuckoo.HashTable RealWorld a b) IO where
-  serialize = SerializeT.mapBase stToIO . serializeHashTableST
-  deserialize = DeserializeT.mapBase stToIO deserializeHashTableST
+  serialize = Serialize.mapBase stToIO . serializeHashTableST
+  deserialize = Deserialize.mapBase stToIO deserializeHashTableST
 
 instance ( Serializable a (ST RealWorld), Serializable b (ST RealWorld), Hashable a, Eq a ) => 
          Serializable (Hashtables_Linear.HashTable RealWorld a b) IO where
-  serialize = SerializeT.mapBase stToIO . serializeHashTableST
-  deserialize = DeserializeT.mapBase stToIO deserializeHashTableST
+  serialize = Serialize.mapBase stToIO . serializeHashTableST
+  deserialize = Deserialize.mapBase stToIO deserializeHashTableST
 

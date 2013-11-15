@@ -1,8 +1,8 @@
 -- |
 -- A monad-transformer over "Data.Serialize.Put".
-module CerealPlus.SerializeT
+module CerealPlus.Serialize
   (
-    SerializeT,
+    Serialize,
     run,
     runLazy,
     exec,
@@ -18,7 +18,7 @@ import qualified Data.Serialize.Put as Cereal
 
 -- | A serialization monad transformer.
 -- Useful for mutable types, which live in monads like `IO`.
-newtype SerializeT m a = SerializeT (WriterT (PutM' ()) m a)
+newtype Serialize m a = Serialize (WriterT (PutM' ()) m a)
   deriving (Functor, Applicative, Monad, MonadIO, MonadTrans, MonadPlus, Alternative)
 
 newtype PutM' a = PutM' (Cereal.PutM a)
@@ -30,29 +30,29 @@ instance Monoid (PutM' ()) where
   mappend a b = a >> b
 
 
-run :: Monad m => SerializeT m a -> m (a, ByteString)
-run (SerializeT w) = do
+run :: Monad m => Serialize m a -> m (a, ByteString)
+run (Serialize w) = do
   (a, PutM' putM) <- runWriterT w
   return (a, Cereal.runPut putM)
 
-runLazy :: Monad m => SerializeT m a -> m (a, LazyByteString)
-runLazy (SerializeT w) = do
+runLazy :: Monad m => Serialize m a -> m (a, LazyByteString)
+runLazy (Serialize w) = do
   (a, PutM' putM) <- runWriterT w
   return (a, Cereal.runPutLazy putM)
 
-exec :: Monad m => SerializeT m a -> m ByteString
-exec (SerializeT w) = do
+exec :: Monad m => Serialize m a -> m ByteString
+exec (Serialize w) = do
   PutM' putM <- execWriterT w
   return $ Cereal.runPut putM
 
-execLazy :: Monad m => SerializeT m a -> m LazyByteString
-execLazy (SerializeT w) = do
+execLazy :: Monad m => Serialize m a -> m LazyByteString
+execLazy (Serialize w) = do
   PutM' putM <- execWriterT w
   return $ Cereal.runPutLazy putM
 
 
-liftPut :: Monad m => Cereal.Put -> SerializeT m ()
-liftPut put = SerializeT $ tell $ PutM' put
+liftPut :: Monad m => Cereal.Put -> Serialize m ()
+liftPut put = Serialize $ tell $ PutM' put
 
-mapBase :: (forall b. m b -> m' b) -> SerializeT m a -> SerializeT m' a
-mapBase f (SerializeT writer) = SerializeT $ mapWriterT f writer
+mapBase :: (forall b. m b -> m' b) -> Serialize m a -> Serialize m' a
+mapBase f (Serialize writer) = Serialize $ mapWriterT f writer

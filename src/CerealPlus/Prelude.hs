@@ -1,12 +1,12 @@
 module CerealPlus.Prelude 
   ( 
     module Exports,
-    (?:),
     LazyByteString,
     LazyText,
     PVector,
     SVector,
     UVector,
+    (?:),
     traceM,
     applyAll,
   )
@@ -31,8 +31,6 @@ import Data.Word as Exports
 import Data.Ratio as Exports
 import Data.Fixed as Exports
 import Data.Ix as Exports
-import Data.Sequence as Exports (Seq)
-import Data.Tree as Exports (Tree)
 import Data.Data as Exports
 import Text.Read as Exports (readMaybe, readEither)
 import Control.Exception as Exports hiding (tryJust)
@@ -68,6 +66,8 @@ import Data.Map as Exports (Map)
 import Data.IntMap as Exports (IntMap)
 import Data.Set as Exports (Set)
 import Data.IntSet as Exports (IntSet)
+import Data.Sequence as Exports (Seq)
+import Data.Tree as Exports (Tree)
 
 -- unordered-containers
 import Data.HashMap.Strict as Exports (HashMap)

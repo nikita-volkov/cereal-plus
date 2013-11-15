@@ -42,8 +42,8 @@ library
     src
   exposed-modules:
     CerealPlus.Serializable
-    CerealPlus.DeserializeT
-    CerealPlus.SerializeT
+    CerealPlus.Deserialize
+    CerealPlus.Serialize
   other-modules:
     CerealPlus.Prelude
   build-depends:
