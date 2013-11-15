@@ -15,7 +15,6 @@ import qualified Data.Serialize.Get as Cereal
 
 
 -- | A deserialization monad transformer. 
--- Useful for mutable types, which live in monads like `IO`.
 newtype Deserialize m a = Deserialize { runPartial :: ByteString -> m (Result m a) }
 
 instance (Monad m) => Monad (Deserialize m) where

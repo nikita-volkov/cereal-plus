@@ -17,7 +17,6 @@ import qualified Data.Serialize.Put as Cereal
 
 
 -- | A serialization monad transformer.
--- Useful for mutable types, which live in monads like `IO`.
 newtype Serialize m a = Serialize (WriterT (PutM' ()) m a)
   deriving (Functor, Applicative, Monad, MonadIO, MonadTrans, MonadPlus, Alternative)
 

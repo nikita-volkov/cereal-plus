@@ -8,6 +8,9 @@ description:
   Provides non-orphan instances for an extended range of types.
   Provides transformer types and support for mutable data.
   Reapproaches the naming conventions of "cereal" library.
+
+  For a streaming frontend over this library see "pipes-cereal-plus":
+  <http://hackage.haskell.org/package/pipes-cereal-plus>
 license:
   MIT
 license-file:

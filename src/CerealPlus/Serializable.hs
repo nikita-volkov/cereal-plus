@@ -34,11 +34,13 @@ import qualified Data.HashTable.ST.Linear as Hashtables_Linear
 -- (e.g., 'IO', 'ST', 'Control.Concurrent.STM.STM', 'Identity'),
 -- meaning that this can be used to provide serialization support for mutable data.
 -- 
--- To use it in a pure context, use 'Identity' monad.
+-- To use it in a pure context, refer to 'Identity' monad.
 class Serializable a m where
   serialize :: (Monad m, Applicative m) => a -> Serialize m ()
   deserialize :: (Monad m, Applicative m) => Deserialize m a
 
+
+-- Manual instances:
 
 instance (HasResolution a, Fractional (Fixed a)) => Serializable (Fixed a) m where
   serialize = serialize . toRational
