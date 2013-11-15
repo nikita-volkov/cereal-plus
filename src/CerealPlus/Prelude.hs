@@ -9,6 +9,8 @@ module CerealPlus.Prelude
     (?:),
     traceM,
     applyAll,
+    packText,
+    unpackText,
   )
   where
 
@@ -97,6 +99,7 @@ import qualified Data.Vector.Primitive
 import qualified Data.Vector.Storable
 import qualified Data.Vector.Unboxed
 import qualified Data.HashMap.Lazy
+import qualified Data.Text
 
 
 type LazyByteString = Data.ByteString.Lazy.ByteString
@@ -115,3 +118,7 @@ traceM s = trace s $ return ()
 
 applyAll :: Monad m => [a -> m b] -> a -> m [b]
 applyAll ops a = sequence $ map ($ a) ops
+
+packText = Data.Text.pack
+unpackText = Data.Text.unpack
+

@@ -40,7 +40,7 @@ instance (Monad m) => Functor (Deserialize m) where
 
 
 data Result m a = 
-  Fail String ByteString |
+  Fail Text ByteString |
   Partial (ByteString -> m (Result m a)) |
   Done a ByteString
 
@@ -49,7 +49,7 @@ liftGet :: Monad m => Cereal.Get a -> Deserialize m a
 liftGet get = Deserialize $ \bs -> return $ convertResult $ Cereal.runGetPartial get bs 
   where
     convertResult r = case r of
-      Cereal.Fail m bs -> Fail m bs
+      Cereal.Fail m bs -> Fail (packText m) bs
       Cereal.Partial cont -> Partial $ \bs -> return $ convertResult $ cont bs
       Cereal.Done a bs -> Done a bs
 
