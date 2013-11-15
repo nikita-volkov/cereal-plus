@@ -2,7 +2,6 @@
 -- A monad-transformer over "Data.Serialize.Put".
 module CerealPlus.SerializeT
   (
-    Serialize,
     SerializeT,
     run,
     runLazy,
@@ -16,9 +15,6 @@ module CerealPlus.SerializeT
 import CerealPlus.Prelude
 import qualified Data.Serialize.Put as Cereal
 
-
--- | A serialization monad used for pure data.
-type Serialize = SerializeT Identity
 
 -- | A serialization monad transformer.
 -- Useful for mutable types, which live in monads like `IO`.

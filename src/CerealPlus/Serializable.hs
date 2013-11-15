@@ -1,8 +1,8 @@
 module CerealPlus.Serializable (Serializable(..)) where
 
 import CerealPlus.Prelude
-import qualified CerealPlus.SerializeT as SerializeT; import CerealPlus.SerializeT (Serialize, SerializeT)
-import qualified CerealPlus.DeserializeT as DeserializeT; import CerealPlus.DeserializeT (Deserialize, DeserializeT)
+import qualified CerealPlus.SerializeT as SerializeT; import CerealPlus.SerializeT (SerializeT)
+import qualified CerealPlus.DeserializeT as DeserializeT; import CerealPlus.DeserializeT (DeserializeT)
 import qualified Data.Serialize as Cereal
 import qualified Data.Text.Encoding as Text
 import qualified Data.Text.Lazy.Encoding as LazyText

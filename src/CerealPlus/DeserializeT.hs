@@ -2,7 +2,6 @@
 -- A monad-transformer over "Data.Serialize.Get".
 module CerealPlus.DeserializeT
   (
-    Deserialize,
     DeserializeT,
     runPartial,
     Result(..),
@@ -14,9 +13,6 @@ module CerealPlus.DeserializeT
 import CerealPlus.Prelude
 import qualified Data.Serialize.Get as Cereal
 
-
--- | A deserialization monad used for pure data.
-type Deserialize = DeserializeT Identity
 
 -- | A deserialization monad transformer. 
 -- Useful for mutable types, which live in monads like `IO`.
