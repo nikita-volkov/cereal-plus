@@ -410,3 +410,14 @@ instance ( Serializable a (ST RealWorld), Serializable b (ST RealWorld), Hashabl
   serialize = Serialize.mapBase stToIO . serializeHashTableST
   deserialize = Deserialize.mapBase stToIO deserializeHashTableST
 
+
+-- Instances for mutable types from 'base':
+
+instance (Serializable a IO) => Serializable (IORef a) IO where
+  serialize = serialize <=< lift . readIORef
+  deserialize = lift . newIORef =<< deserialize
+
+instance (Serializable a IO) => Serializable (MVar a) IO where
+  serialize = lift . readMVar >=> serialize
+  deserialize = deserialize >>= lift . newMVar
+
