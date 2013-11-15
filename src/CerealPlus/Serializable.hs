@@ -27,6 +27,7 @@ import qualified Data.HashTable.IO as Hashtables_IO
 import qualified Data.HashTable.ST.Basic as Hashtables_Basic
 import qualified Data.HashTable.ST.Cuckoo as Hashtables_Cuckoo
 import qualified Data.HashTable.ST.Linear as Hashtables_Linear
+import qualified GHC.Generics as Generics; import GHC.Generics ((:+:)(..), (:*:)(..))
 
 
 -- |
@@ -38,6 +39,47 @@ import qualified Data.HashTable.ST.Linear as Hashtables_Linear
 class Serializable a m where
   serialize :: (Monad m, Applicative m) => a -> Serialize m ()
   deserialize :: (Monad m, Applicative m) => Deserialize m a
+
+  default serialize :: 
+    (Applicative m, Monad m, Generic a, SerializableRep (Generics.Rep a) m) => 
+    a -> Serialize m ()
+  serialize = serializeRep . Generics.from
+
+  default deserialize ::
+    (Applicative m, Monad m, Generic a, SerializableRep (Generics.Rep a) m) => 
+    Deserialize m a
+  deserialize = Generics.to <$> deserializeRep
+
+
+-- Generics:
+
+class SerializableRep r m where
+  serializeRep :: (Applicative m, Monad m) => r a -> Serialize m ()
+  deserializeRep :: (Applicative m, Monad m) => Deserialize m (r a)
+
+instance SerializableRep Generics.U1 m where
+  serializeRep _ = pure ()
+  deserializeRep = pure Generics.U1
+
+instance (SerializableRep a m) => SerializableRep (Generics.M1 i c a) m where
+  serializeRep = serializeRep . Generics.unM1
+  deserializeRep = Generics.M1 <$> deserializeRep
+
+instance (Serializable a m) => SerializableRep (Generics.K1 i a) m where
+  serializeRep = serialize . Generics.unK1
+  deserializeRep = Generics.K1 <$> deserialize
+
+instance (SerializableRep a m, SerializableRep b m) => SerializableRep (a :*: b) m where
+  serializeRep (a :*: b) = serializeRep a *> serializeRep b
+  deserializeRep = (:*:) <$> deserializeRep <*> deserializeRep
+
+instance (SerializableRep a m, SerializableRep b m) => SerializableRep (a :+: b) m where
+  serializeRep = \case
+    Generics.L1 a -> serialize False *> serializeRep a
+    Generics.R1 a -> serialize True *> serializeRep a
+  deserializeRep = deserialize >>= \case
+    False -> Generics.L1 <$> deserializeRep
+    True -> Generics.R1 <$> deserializeRep
 
 
 -- Manual instances:
