@@ -6,8 +6,7 @@ An extended serialization library on top of "cereal".
 - Provides transformer types and support for mutable data.
 - Reapproaches the naming conventions of "cereal" library.
 
-## Status
-In development.
+For a streaming frontend over this library see [**pipes-cereal-plus**](https://github.com/nikita-volkov/pipes-cereal-plus).
 
 ---
 [![Build Status](https://travis-ci.org/nikita-volkov/cereal-plus.png)](https://travis-ci.org/nikita-volkov/cereal-plus)
