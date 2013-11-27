@@ -96,6 +96,9 @@ import Data.Time.Clock.TAI as Exports (AbsoluteTime)
 -- errors
 import Control.Error as Exports
 
+-- cio
+import CIO as Exports
+
 import qualified Data.ByteString.Lazy
 import qualified Data.Text.Lazy
 import qualified Data.Vector.Primitive

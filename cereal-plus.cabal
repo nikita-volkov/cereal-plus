@@ -1,7 +1,7 @@
 name:
   cereal-plus
 version:
-  0.2.0
+  0.2.1
 synopsis:
   Extended serialization library on top of "cereal".
 description:
@@ -50,6 +50,7 @@ library
   other-modules:
     CerealPlus.Prelude
   build-depends:
+    cio,
     cereal == 0.4.*,
     errors,
     time,
