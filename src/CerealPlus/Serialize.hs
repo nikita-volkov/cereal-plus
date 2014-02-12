@@ -20,16 +20,6 @@ import qualified Data.Serialize.Put as Cereal
 newtype Serialize m a = Serialize (WriterT (PutM' ()) m a)
   deriving (Functor, Applicative, Monad, MonadIO, MonadTrans, MonadPlus, Alternative)
 
-instance (MonadCIO m) => MonadCIO (Serialize m) where
-  getPoolNumCapabilities =
-    lift getPoolNumCapabilities
-  sequenceConcurrently actions =
-    Serialize $ forMConcurrently actions $ \(Serialize writer) -> writer
-  sequenceConcurrently' actions =
-    Serialize $ forMConcurrently' actions $ \(Serialize writer) -> writer
-  sequenceConcurrently_ actions =
-    Serialize $ forMConcurrently_ actions $ \(Serialize writer) -> writer
-
 
 newtype PutM' a = PutM' (Cereal.PutM a)
   deriving (Functor, Applicative, Monad)
