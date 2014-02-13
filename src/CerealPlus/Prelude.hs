@@ -6,9 +6,7 @@ module CerealPlus.Prelude
     PVector,
     SVector,
     UVector,
-    (?:),
     traceM,
-    applyAll,
     packText,
     unpackText,
   )
@@ -113,15 +111,8 @@ type SVector = Data.Vector.Storable.Vector
 type UVector = Data.Vector.Unboxed.Vector
 
 
-(?:) :: Maybe a -> a -> a
-maybeA ?: b = fromMaybe b maybeA
-{-# INLINE (?:) #-}
-
 traceM :: (Monad m) => String -> m ()
 traceM s = trace s $ return ()
-
-applyAll :: Monad m => [a -> m b] -> a -> m [b]
-applyAll ops a = sequence $ map ($ a) ops
 
 packText = Data.Text.pack
 unpackText = Data.Text.unpack
