@@ -65,6 +65,7 @@ library
     text,
     bytestring,
     -- Control:
+    layers == 0.1.*,
     errors,
     mtl,
     base >= 4.5 && < 5

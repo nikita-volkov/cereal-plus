@@ -12,6 +12,7 @@ module CerealPlus.Deserialize
 
 import CerealPlus.Prelude
 import qualified Data.Serialize.Get as Cereal
+import qualified Control.Monad.Layer as Layers
 
 
 -- | A deserialization monad transformer. 
@@ -41,6 +42,21 @@ instance (Monad m) => Applicative (Deserialize m) where
 instance (Monad m) => Functor (Deserialize m) where
   fmap = liftM
 
+instance (Monad m) => Layers.MonadTransFunctor (Deserialize m) where
+  transMap = mapBase
+
+instance (Monad m) => Layers.MonadTrans (Deserialize m) where
+  type Outer (Deserialize m) = Deserialize
+  transInvmap = const . Layers.transMap
+
+instance (Monad m) => Layers.MonadLayerFunctor (Deserialize m) where
+  layerMap = Layers.transMap
+
+instance (Monad m) => Layers.MonadLayer (Deserialize m) where
+  type Inner (Deserialize m) = m
+  layerInvmap = const . Layers.layerMap
+  layer = lift
+
 
 -- | A partial result of deserialization.
 data Result m a = 
@@ -60,7 +76,7 @@ liftGet get = Deserialize $ \bs -> return $ convertResult $ Cereal.runGetPartial
       Cereal.Partial cont -> Partial $ \bs -> return $ convertResult $ cont bs
       Cereal.Done a bs -> Done a bs
 
--- | Change the base monad. 
+-- | Change the base monad. Same as `Layers.transMap` of the \"layers\" library.
 mapBase :: (Monad m, Monad m') => (forall b. m b -> m' b) -> Deserialize m a -> Deserialize m' a
 mapBase mToM' = \(Deserialize runPartial) -> Deserialize $ runPartialToRunPartial' runPartial
   where
