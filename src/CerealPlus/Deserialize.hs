@@ -15,7 +15,10 @@ import qualified Data.Serialize.Get as Cereal
 
 
 -- | A deserialization monad transformer. 
-newtype Deserialize m a = Deserialize { runPartial :: ByteString -> m (Result m a) }
+newtype Deserialize m a = Deserialize { 
+  -- | Run on a chunk of data and get a partial result.
+  runPartial :: ByteString -> m (Result m a) 
+}
 
 instance (Monad m) => Monad (Deserialize m) where
   Deserialize runA >>= aToDeserializeTB = Deserialize $ \bs -> runA bs >>= aToMB where
@@ -39,12 +42,16 @@ instance (Monad m) => Functor (Deserialize m) where
   fmap = liftM
 
 
+-- | A partial result of deserialization.
 data Result m a = 
+  -- | A message describing the deserialization failure and a remaining chunk.
   Fail Text ByteString |
+  -- | A continuation function, which should be supplied with the next chunk.
   Partial (ByteString -> m (Result m a)) |
+  -- | A deserialized data structure and a remaining chunk.
   Done a ByteString
 
-
+-- | Run a `Cereal.Get` action of the \"cereal\" library.
 liftGet :: Monad m => Cereal.Get a -> Deserialize m a
 liftGet get = Deserialize $ \bs -> return $ convertResult $ Cereal.runGetPartial get bs 
   where
@@ -53,8 +60,9 @@ liftGet get = Deserialize $ \bs -> return $ convertResult $ Cereal.runGetPartial
       Cereal.Partial cont -> Partial $ \bs -> return $ convertResult $ cont bs
       Cereal.Done a bs -> Done a bs
 
+-- | Change the base monad. 
 mapBase :: (Monad m, Monad m') => (forall b. m b -> m' b) -> Deserialize m a -> Deserialize m' a
-mapBase mToM' (Deserialize runPartial) = Deserialize $ runPartialToRunPartial' runPartial
+mapBase mToM' = \(Deserialize runPartial) -> Deserialize $ runPartialToRunPartial' runPartial
   where
     runPartialToRunPartial' runPartial = 
       mToM' . runPartial >=> \case

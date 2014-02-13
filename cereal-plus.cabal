@@ -3,14 +3,14 @@ name:
 version:
   0.3.2
 synopsis:
-  Extended serialization library on top of "cereal".
+  An extended serialization library on top of "cereal"
 description:
-  Provides non-orphan instances for an extended range of types.
-  Provides transformer types and support for mutable data.
-  Reapproaches the naming conventions of "cereal" library.
+  Provides non-orphan instances for an extended range of types, 
+  transformer types and support for mutable data,
+  while reapproaching the naming conventions of \"cereal\" library.
 
-  For a streaming frontend over this library see "pipes-cereal-plus":
-  <http://hackage.haskell.org/package/pipes-cereal-plus>
+  For a streaming frontend over this library see 
+  <http://hackage.haskell.org/package/pipes-cereal-plus "pipes-cereal-plus">
 license:
   MIT
 license-file:
@@ -50,8 +50,11 @@ library
   other-modules:
     CerealPlus.Prelude
   build-depends:
+    -- Serialization:
     cereal == 0.4.*,
-    errors,
+    -- Concurrency:
+    stm,
+    -- Data:
     time,
     hashable,
     hashtables,
@@ -61,7 +64,8 @@ library
     containers,
     text,
     bytestring,
-    stm,
+    -- Control:
+    errors,
     mtl,
     base >= 4.5 && < 5
   default-extensions:
