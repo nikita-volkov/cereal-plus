@@ -150,7 +150,6 @@ instance Serializable m AbsoluteTime where
 
 -- 'cereal' primitive instances wrappers:
 
-instance Serializable m Bool where serialize = put; deserialize = get
 instance Serializable m Char where serialize = put; deserialize = get
 instance Serializable m Double where serialize = put; deserialize = get
 instance Serializable m Float where serialize = put; deserialize = get
@@ -160,7 +159,6 @@ instance Serializable m Int16 where serialize = put; deserialize = get
 instance Serializable m Int32 where serialize = put; deserialize = get
 instance Serializable m Int64 where serialize = put; deserialize = get
 instance Serializable m Integer where serialize = put; deserialize = get
-instance Serializable m Ordering where serialize = put; deserialize = get
 instance Serializable m Word where serialize = put; deserialize = get
 instance Serializable m Word8 where serialize = put; deserialize = get
 instance Serializable m Word16 where serialize = put; deserialize = get
@@ -176,6 +174,33 @@ put = Serialize.liftPut . Cereal.put
 
 get :: (Monad m, Applicative m, Cereal.Serialize a) => Deserialize m a
 get = Deserialize.liftGet Cereal.get
+
+
+-- fixed 'cereal' instances:
+
+instance Serializable m Bool where 
+  serialize a = 
+    Serialize.liftPut . Cereal.putWord8 $ case a of
+      False -> 0
+      True -> 1
+  deserialize = do
+    Deserialize.liftGet Cereal.getWord8 >>= \case
+      0 -> return False
+      1 -> return True
+      _ -> Deserialize.throwError "Out of range"
+
+instance Serializable m Ordering where 
+  serialize a = 
+    Serialize.liftPut . Cereal.putWord8 $ case a of
+      LT -> 0
+      EQ -> 1
+      GT -> 2
+  deserialize = do
+    Deserialize.liftGet Cereal.getWord8 >>= \case
+      0 -> return LT
+      1 -> return EQ
+      2 -> return GT
+      _ -> Deserialize.throwError "Out of range"
 
 
 -- Monoid wrappers instances:

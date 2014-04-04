@@ -7,6 +7,7 @@ module CerealPlus.Deserialize
     Result(..),
     liftGet,
     mapBase,
+    throwError,
   )
   where
 
@@ -86,3 +87,12 @@ mapBase mToM' = \(Deserialize runPartial) -> Deserialize $ runPartialToRunPartia
         Partial runPartial' -> return $ Partial $ runPartialToRunPartial' runPartial'
         Done a bs -> return $ Done a bs
 
+-- | 
+-- Fail with a message.
+-- 
+-- Since there's no consensus on how to implement 'catchError' of 'MonadError', 
+-- we'll go with just this function.
+-- 
+-- It is not implemented as 'fail' because 'fail' is pure evil.
+throwError :: (Monad m) => Text -> Deserialize m a
+throwError t = Deserialize $ \bs -> return $ Fail t bs
