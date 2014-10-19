@@ -422,18 +422,18 @@ deserializeHashTableST = do
 
 instance ( Serializable (ST RealWorld) a, Serializable (ST RealWorld) b, Hashable a, Eq a ) => 
          Serializable IO (Hashtables_Basic.HashTable RealWorld a b) where
-  serialize = Serialize.mapBase stToIO . serializeHashTableST
-  deserialize = Deserialize.mapBase stToIO deserializeHashTableST
+  serialize = hoist stToIO . serializeHashTableST
+  deserialize = hoist stToIO deserializeHashTableST
 
 instance ( Serializable (ST RealWorld) a, Serializable (ST RealWorld) b, Hashable a, Eq a ) => 
          Serializable IO (Hashtables_Cuckoo.HashTable RealWorld a b) where
-  serialize = Serialize.mapBase stToIO . serializeHashTableST
-  deserialize = Deserialize.mapBase stToIO deserializeHashTableST
+  serialize = hoist stToIO . serializeHashTableST
+  deserialize = hoist stToIO deserializeHashTableST
 
 instance ( Serializable (ST RealWorld) a, Serializable (ST RealWorld) b, Hashable a, Eq a ) => 
          Serializable IO (Hashtables_Linear.HashTable RealWorld a b) where
-  serialize = Serialize.mapBase stToIO . serializeHashTableST
-  deserialize = Deserialize.mapBase stToIO deserializeHashTableST
+  serialize = hoist stToIO . serializeHashTableST
+  deserialize = hoist stToIO deserializeHashTableST
 
 
 -- Instances for mutable types from 'base':

@@ -6,14 +6,12 @@ module CerealPlus.Deserialize
     runPartial,
     Result(..),
     liftGet,
-    mapBase,
     throwError,
   )
   where
 
 import CerealPlus.Prelude
 import qualified Data.Serialize.Get as Cereal
-import qualified Control.Monad.Layer as Layers
 
 
 -- | A deserialization monad transformer. 
@@ -43,20 +41,8 @@ instance (Monad m) => Applicative (Deserialize m) where
 instance (Monad m) => Functor (Deserialize m) where
   fmap = liftM
 
-instance (Monad m) => Layers.MonadTransFunctor (Deserialize m) where
-  transMap = mapBase
-
-instance (Monad m) => Layers.MonadTrans (Deserialize m) where
-  type Outer (Deserialize m) = Deserialize
-  transInvmap = const . Layers.transMap
-
-instance (Monad m) => Layers.MonadLayerFunctor (Deserialize m) where
-  layerMap = Layers.transMap
-
-instance (Monad m) => Layers.MonadLayer (Deserialize m) where
-  type Inner (Deserialize m) = m
-  layerInvmap = const . Layers.layerMap
-  layer = lift
+instance MFunctor Deserialize where
+  hoist nat (Deserialize k) = Deserialize (nat . liftM (hoist nat) . k)
 
 
 -- | A partial result of deserialization.
@@ -68,6 +54,12 @@ data Result m a =
   -- | A deserialized data structure and a remaining chunk.
   Done a ByteString
 
+instance MFunctor Result where
+  hoist nat (Fail str bs) = Fail str bs
+  hoist nat (Partial k)   = Partial (nat . liftM (hoist nat) . k)
+  hoist nat (Done a bs)   = Done a bs
+
+
 -- | Run a `Cereal.Get` action of the \"cereal\" library.
 liftGet :: Monad m => Cereal.Get a -> Deserialize m a
 liftGet get = Deserialize $ \bs -> return $ convertResult $ Cereal.runGetPartial get bs 
@@ -77,15 +69,6 @@ liftGet get = Deserialize $ \bs -> return $ convertResult $ Cereal.runGetPartial
       Cereal.Partial cont -> Partial $ \bs -> return $ convertResult $ cont bs
       Cereal.Done a bs -> Done a bs
 
--- | Change the base monad. Same as `Layers.transMap` of the \"layers\" library.
-mapBase :: (Monad m, Monad m') => (forall b. m b -> m' b) -> Deserialize m a -> Deserialize m' a
-mapBase mToM' = \(Deserialize runPartial) -> Deserialize $ runPartialToRunPartial' runPartial
-  where
-    runPartialToRunPartial' runPartial = 
-      mToM' . runPartial >=> \case
-        Fail m bs -> return $ Fail m bs
-        Partial runPartial' -> return $ Partial $ runPartialToRunPartial' runPartial'
-        Done a bs -> return $ Done a bs
 
 -- | 
 -- Fail with a message.

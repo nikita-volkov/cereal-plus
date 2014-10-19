@@ -8,33 +8,19 @@ module CerealPlus.Serialize
     exec,
     execLazy,
     liftPut,
-    mapBase,
   )
   where
 
 import CerealPlus.Prelude
 import qualified Data.Serialize.Put as Cereal
-import qualified Control.Monad.Layer as Layers
 
 
 -- | A serialization monad transformer.
 newtype Serialize m a = Serialize (WriterT (PutM' ()) m a)
   deriving (Functor, Applicative, Monad, MonadIO, MonadTrans, MonadPlus, Alternative)
 
-instance (Monad m) => Layers.MonadTransFunctor (Serialize m) where
-  transMap = mapBase
-
-instance (Monad m) => Layers.MonadTrans (Serialize m) where
-  type Outer (Serialize m) = Serialize
-  transInvmap = const . Layers.transMap
-
-instance (Monad m) => Layers.MonadLayerFunctor (Serialize m) where
-  layerMap = Layers.transMap
-
-instance (Monad m) => Layers.MonadLayer (Serialize m) where
-  type Inner (Serialize m) = m
-  layerInvmap = const . Layers.layerMap
-  layer = lift
+instance MFunctor Serialize where
+  hoist f (Serialize writer) = Serialize $ mapWriterT f writer
 
 
 
@@ -74,7 +60,3 @@ execLazy (Serialize w) = do
 -- | Run a `Cereal.Put` action of the \"cereal\" library.
 liftPut :: Monad m => Cereal.Put -> Serialize m ()
 liftPut put = Serialize $ tell $ PutM' put
-
--- | Change the base monad. Same as `Layers.transMap` of the \"layers\" library.
-mapBase :: (forall b. m b -> m' b) -> Serialize m a -> Serialize m' a
-mapBase f (Serialize writer) = Serialize $ mapWriterT f writer

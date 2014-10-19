@@ -6,7 +6,6 @@ module HTFTestSuite.Prelude
     PVector,
     SVector,
     UVector,
-    traceM,
     packText,
     unpackText,
   )
@@ -54,6 +53,9 @@ import Control.Monad.Identity as Exports hiding (mapM_, sequence_, forM_, msum, 
 import Control.Monad.Reader as Exports hiding (mapM_, sequence_, forM_, msum, mapM, sequence, forM)
 import Control.Monad.Writer as Exports hiding (mapM_, sequence_, forM_, msum, mapM, sequence, forM)
 import Control.Monad.Trans as Exports
+
+-- mmorph
+import Control.Monad.Morph as Exports
 
 -- stm
 import Control.Concurrent.STM as Exports
@@ -110,9 +112,6 @@ type PVector = Data.Vector.Primitive.Vector
 type SVector = Data.Vector.Storable.Vector
 type UVector = Data.Vector.Unboxed.Vector
 
-
-traceM :: (Monad m) => String -> m ()
-traceM s = trace s $ return ()
 
 packText = Data.Text.pack
 unpackText = Data.Text.unpack
