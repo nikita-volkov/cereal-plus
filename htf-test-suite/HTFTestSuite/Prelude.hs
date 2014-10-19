@@ -6,6 +6,7 @@ module HTFTestSuite.Prelude
     PVector,
     SVector,
     UVector,
+    traceM,
     packText,
     unpackText,
   )
@@ -43,7 +44,7 @@ import Unsafe.Coerce as Exports
 import GHC.Exts as Exports (groupWith, sortWith)
 import GHC.Generics as Exports (Generic)
 import GHC.IO.Exception as Exports
-import Debug.Trace as Exports
+import Debug.Trace as Exports hiding (traceM)
 import Data.IORef as Exports
 import Data.STRef as Exports
 import Control.Monad.ST as Exports
@@ -112,6 +113,9 @@ type PVector = Data.Vector.Primitive.Vector
 type SVector = Data.Vector.Storable.Vector
 type UVector = Data.Vector.Unboxed.Vector
 
+
+traceM :: (Monad m) => String -> m ()
+traceM s = trace s $ return ()
 
 packText = Data.Text.pack
 unpackText = Data.Text.unpack
