@@ -5,20 +5,20 @@ version:
 synopsis:
   An extended serialization library on top of "cereal"
 description:
-  Provides non-orphan instances for an extended range of types, 
+  Provides non-orphan instances for an extended range of types,
   transformer types and support for mutable data,
   while reapproaching the naming conventions of \"cereal\" library.
 
-  For a streaming frontend over this library see 
+  For a streaming frontend over this library see
   <http://hackage.haskell.org/package/pipes-cereal-plus "pipes-cereal-plus">
 license:
   MIT
 license-file:
   LICENSE
 homepage:
-  https://github.com/nikita-volkov/cereal-plus 
+  https://github.com/nikita-volkov/cereal-plus
 bug-reports:
-  https://github.com/nikita-volkov/cereal-plus/issues 
+  https://github.com/nikita-volkov/cereal-plus/issues
 author:
   Nikita Volkov <nikita.y.volkov@mail.ru>
 maintainer:
@@ -51,7 +51,7 @@ library
     CerealPlus.Prelude
   build-depends:
     -- Serialization:
-    cereal == 0.4.*,
+    cereal,
     -- Concurrency:
     stm,
     -- Data:
@@ -65,10 +65,10 @@ library
     text,
     bytestring,
     -- Control:
-    mmorph == 1.0.*,
-    errors == 1.4.*,
-    mtl >= 2 && < 2.3,
-    base >= 4.5 && < 4.8
+    mmorph,
+    errors,
+    mtl,
+    base
   ghc-options:
     -funbox-strict-fields
   default-extensions:
@@ -78,11 +78,11 @@ library
 
 
 test-suite cereal-plus-htf-test-suite
-  type:             
+  type:
     exitcode-stdio-1.0
-  hs-source-dirs:   
+  hs-source-dirs:
     htf-test-suite
-  main-is:          
+  main-is:
     HTFTestSuite.hs
   build-depends:
     cereal-plus,
@@ -90,7 +90,7 @@ test-suite cereal-plus-htf-test-suite
     quickcheck-instances,
     QuickCheck,
     HUnit,
-    HTF == 0.12.*,
+    HTF,
     -- Serialization:
     cereal,
     -- Concurrency:
