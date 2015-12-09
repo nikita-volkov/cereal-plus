@@ -1,7 +1,7 @@
 name:
   cereal-plus
 version:
-  0.4.0
+  0.4.1
 synopsis:
   An extended serialization library on top of "cereal"
 description:
@@ -66,9 +66,9 @@ library
     bytestring,
     -- Control:
     mmorph == 1.0.*,
-    errors == 1.4.*,
+    errors >= 1.4 && < 2.1,
     mtl >= 2 && < 2.3,
-    base >= 4.5 && < 4.8
+    base >= 4.5 && < 4.9
   ghc-options:
     -funbox-strict-fields
   default-extensions:
@@ -90,7 +90,7 @@ test-suite cereal-plus-htf-test-suite
     quickcheck-instances,
     QuickCheck,
     HUnit,
-    HTF == 0.12.*,
+    HTF == 0.13.*,
     -- Serialization:
     cereal,
     -- Concurrency:
