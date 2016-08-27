@@ -51,7 +51,7 @@ library
     CerealPlus.Prelude
   build-depends:
     -- Serialization:
-    cereal == 0.4.*,
+    cereal >= 0.4,
     -- Concurrency:
     stm,
     -- Data:
@@ -65,10 +65,10 @@ library
     text,
     bytestring,
     -- Control:
-    mmorph == 1.0.*,
-    errors >= 1.4 && < 2.1,
-    mtl >= 2 && < 2.3,
-    base >= 4.5 && < 4.9
+    mmorph >= 1.0,
+    errors >= 1.4,
+    mtl >= 2,
+    base >= 4.5 && < 5
   ghc-options:
     -funbox-strict-fields
   default-extensions:
